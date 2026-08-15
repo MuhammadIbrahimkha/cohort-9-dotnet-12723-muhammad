@@ -1,0 +1,35 @@
+## ---------- .NET ----------
+bin/
+obj/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+.vs/
+*.vssscc
+
+[Dd]ebug/
+[Rr]elease/
+x64/
+x86/
+[Aa]rtifacts/
+
+appsettings.Development.json
+appsettings.Local.json
+*.env
+
+*.nupkg
+**/packages/*
+!**/packages/build/
+
+.idea/
+*.swp
+
+## ---------- OS ----------
+.DS_Store
+Thumbs.db
+
+## ---------- Logs (Serilog, once added) ----------
+logs/
+*.log
