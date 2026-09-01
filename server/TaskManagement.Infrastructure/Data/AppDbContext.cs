@@ -1,16 +1,14 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using TaskManagement.Domain.Entities;
 
-namespace TaskManagement.Infrastructure.Data;
+namespace TaskManagement.Infrastructure.Data
+{
 
-/// <summary>
-/// The Entity Framework Core database context for the Task Management application.
-/// </summary>
+
+
 public class AppDbContext : DbContext
 {
-    public AppDbContext(DbContextOptions<AppDbContext> options) : base(options)
-    {
-    }
+        public AppDbContext(DbContextOptions<AppDbContext> options) : base(options) { }
 
     /// <summary>
     /// The set of users in the database.
@@ -62,4 +60,5 @@ public class AppDbContext : DbContext
                 .OnDelete(DeleteBehavior.Restrict);
         });
     }
+}
 }
