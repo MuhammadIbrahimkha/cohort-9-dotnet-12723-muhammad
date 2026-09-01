@@ -6,6 +6,9 @@ using TaskManagement.Infrastructure.Data;
 
 namespace TaskManagement.Infrastructure.Repositories;
 
+/// <summary>
+/// EF Core implementation of <see cref="IUserRepository"/>.
+/// </summary>
 public class UserRepository : IUserRepository
 {
     private readonly AppDbContext _context;

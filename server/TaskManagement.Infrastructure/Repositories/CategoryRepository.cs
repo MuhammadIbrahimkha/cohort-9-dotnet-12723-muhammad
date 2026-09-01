@@ -6,6 +6,9 @@ using TaskManagement.Infrastructure.Data;
 
 namespace TaskManagement.Infrastructure.Repositories;
 
+/// <summary>
+/// EF Core implementation of <see cref="ICategoryRepository"/>.
+/// </summary>
 public class CategoryRepository : ICategoryRepository
 {
     private readonly AppDbContext _context;
