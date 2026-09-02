@@ -17,7 +17,7 @@ public class TaskRepository : ITaskRepository
     public async Task<TaskItem?> GetByIdAsync(int id) =>
         await _context.Tasks.Include(t => t.Category).Include(t => t.AssignedToUser).Include(t => t.CreatedByUser)
             .FirstOrDefaultAsync(t => t.Id == id);
-    }
+    
 
     public async Task<IEnumerable<TaskItem>> GetAllAsync() =>
         await _context.Tasks.Include(t => t.Category).Include(t => t.AssignedToUser).Include(t => t.CreatedByUser).ToListAsync();
