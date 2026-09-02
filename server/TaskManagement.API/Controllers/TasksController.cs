@@ -25,9 +25,22 @@ public class TasksController : ControllerBase
     /// Retrieves all tasks.
     /// </summary>
     [HttpGet]
-    public async Task<ActionResult<IEnumerable<TaskItemDto>>> GetAll()
+    public async Task<ActionResult<IEnumerable<TaskItemDto>>> GetAll([FromQuery] string? status, [FromQuery] string? priority, [FromQuery] int? categoryId, [FromQuery] int? assignedToUserId)
     {
         var tasks = await _taskService.GetAllAsync();
+
+        if (!string.IsNullOrEmpty(status))
+            tasks = tasks.Where(t => t.Status.Equals(status, StringComparison.OrdinalIgnoreCase));
+
+        if (!string.IsNullOrEmpty(priority))
+            tasks = tasks.Where(t => t.Priority.Equals(priority, StringComparison.OrdinalIgnoreCase));
+
+        if (categoryId.HasValue)
+            tasks = tasks.Where(t => t.CategoryId == categoryId.Value);
+
+        if (assignedToUserId.HasValue)
+            tasks = tasks.Where(t => t.AssignedToUserId == assignedToUserId.Value);
+
         return Ok(tasks);
     }
 
