@@ -84,6 +84,14 @@ using (var scope = app.Services.CreateScope())
     }
 }
 
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowReactApp", policy =>
+        policy.WithOrigins("http://localhost:5014")
+        .AllowAnyHeader()
+        .AllowAnyMethod());
+});
+
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
@@ -93,6 +101,7 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 app.UseAuthentication();
+app.UseCors("AllowReactApp");
 app.UseAuthorization();
 
 app.MapControllers();
