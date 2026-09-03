@@ -21,13 +21,24 @@ public class TasksController : ControllerBase
         _taskService = taskService;
     }
 
-    /// <summary>
-    /// Retrieves all tasks.
-    /// </summary>
     [HttpGet]
-    public async Task<ActionResult<IEnumerable<TaskItemDto>>> GetAll([FromQuery] string? status, [FromQuery] string? priority, [FromQuery] int? categoryId, [FromQuery] int? assignedToUserId)
+    public async Task<ActionResult<IEnumerable<TaskItemDto>>> GetAll(
+     [FromQuery] string? status,
+     [FromQuery] string? priority,
+     [FromQuery] int? categoryId)
     {
         var tasks = await _taskService.GetAllAsync();
+
+        if (!User.IsInRole("Admin"))
+        {
+            var userIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier)
+                ?? User.FindFirstValue("sub");
+            if (userIdClaim is null || !int.TryParse(userIdClaim, out var currentUserId))
+            {
+                return Unauthorized();
+            }
+            tasks = tasks.Where(t => t.AssignedToUserId == currentUserId);
+        }
 
         if (!string.IsNullOrEmpty(status))
             tasks = tasks.Where(t => t.Status.Equals(status, StringComparison.OrdinalIgnoreCase));
@@ -37,9 +48,6 @@ public class TasksController : ControllerBase
 
         if (categoryId.HasValue)
             tasks = tasks.Where(t => t.CategoryId == categoryId.Value);
-
-        if (assignedToUserId.HasValue)
-            tasks = tasks.Where(t => t.AssignedToUserId == assignedToUserId.Value);
 
         return Ok(tasks);
     }

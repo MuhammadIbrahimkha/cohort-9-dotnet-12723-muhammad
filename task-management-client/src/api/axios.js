@@ -2,6 +2,10 @@ import axios from 'axios';
 
 const api = axios.create({
   baseURL: 'https://localhost:7069/api', 
+  headers: {
+    'Cache-Control': 'no-cache',
+    'Pragma': 'no-cache',
+  },
 });
 
 api.interceptors.request.use((config) => {
