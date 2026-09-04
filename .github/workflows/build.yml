@@ -44,5 +44,5 @@ jobs:
         shell: powershell
         run: |
           ${{ runner.temp }}\scanner\dotnet-sonarscanner begin /k:"MuhammadIbrahimkha_cohort-9-dotnet-12723-muhammad" /o:"muhammadibrahimkha" /d:sonar.token="${{ secrets.SONAR_TOKEN }}"
-          dotnet build
+         dotnet build TaskManagementTool/TaskManagementTool.sln
           ${{ runner.temp }}\scanner\dotnet-sonarscanner end /d:sonar.token="${{ secrets.SONAR_TOKEN }}"
