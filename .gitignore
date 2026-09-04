@@ -33,3 +33,5 @@ Thumbs.db
 ## ---------- Logs (Serilog, once added) ----------
 logs/
 *.log
+/TaskManagementTool/.sonarqube
+.sonarqube/
