@@ -326,7 +326,50 @@ Use this account to test Admin-only functionality, such as deleting tasks and vi
 
 ## Code Quality
 
-The project is integrated with **SonarQube** for static code analysis, covering both the C# backend and the JavaScript/React frontend, to identify code smells, potential bugs, and maintainability issues.
+The project is integrated with **SonarQube Community Build** for static code analysis and code quality monitoring.
+
+SonarQube analyzes the complete full-stack application in a **single project**, covering:
+
+* **C# backend** — ASP.NET Core Web API and supporting projects
+* **JavaScript/React frontend**
+* **CSS**
+
+The analysis helps identify bugs, reliability issues, security issues, code smells, maintainability issues, and code duplication.
+
+### SonarQube Analysis
+
+SonarQube is configured to run locally at:
+
+```text
+http://localhost:9000
+```
+
+The project is analyzed using the **SonarScanner for .NET**:
+
+```powershell
+dotnet-sonarscanner begin /k:"Task-Management-Tool" /d:sonar.host.url="http://localhost:9000" /d:sonar.token="YOUR_SONAR_TOKEN"
+
+dotnet build .\TaskManagementTool\TaskManagementTool.sln
+
+dotnet-sonarscanner end /d:sonar.token="YOUR_SONAR_TOKEN"
+```
+
+The analysis is performed as a **single SonarQube project** for both backend and frontend.
+
+Latest analysis results:
+
+* **Quality Gate:** Passed
+* **Lines of Code:** 1.7k
+* **Security Rating:** A
+* **Reliability:** D
+* **Maintainability:** 3 open issues
+* **Duplications:** 2.0%
+* **Coverage:** 0.0%
+
+> **Note:** `YOUR_SONAR_TOKEN` represents a locally generated SonarQube user token and must not be committed to the repository.
+
+SonarQube Dashboard: `http://localhost:9000/dashboard?id=Task-Management-Tool`
+
 
 ---
  
