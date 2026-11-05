@@ -1,0 +1,40 @@
+trigger:
+  branches:
+    include:
+      - develop
+      - main
+
+pool:
+  vmImage: ubuntu-latest
+
+stages:
+  - stage: Build
+    displayName: Build and test
+    jobs:
+      - job: Backend
+        displayName: Backend (.NET 8)
+        steps:
+          - task: UseDotNet@2
+            inputs:
+              packageType: sdk
+              version: 8.0.x
+          - script: dotnet restore TaskManagementTool/TaskManagementTool.sln
+            displayName: Restore
+          - script: dotnet build TaskManagementTool/TaskManagementTool.sln -c Release --no-restore
+            displayName: Build
+          - script: dotnet test TaskManagementTool/TaskManagementTool.sln -c Release --no-build
+            displayName: Run unit tests
+          - script: dotnet publish server/TaskManagement.API/TaskManagement.API.csproj -c Release -o $(Build.ArtifactStagingDirectory)/api
+            displayName: Publish API
+          - publish: $(Build.ArtifactStagingDirectory)/api
+            artifact: api
+
+      - job: Frontend
+        displayName: Frontend (React)
+        steps:
+          - task: NodeTool@0
+            inputs:
+              versionSpec: 20.x
+          - script: npm ci && npm run build
+            workingDirectory: task-management-client
+            displayName: Install and build
