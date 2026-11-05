@@ -86,10 +86,15 @@ builder.Services.AddAuthentication(options =>
 
 builder.Services.AddAuthorization();
 
+// Allowed frontend origins come from config (env var Cors__AllowedOrigins), comma separated
+var allowedOrigins = (builder.Configuration["Cors:AllowedOrigins"]
+    ?? "http://localhost:5173,http://localhost:3000")
+    .Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowReactApp", policy =>
-        policy.WithOrigins("http://localhost:5173")
+        policy.WithOrigins(allowedOrigins)
         .AllowAnyHeader()
         .AllowAnyMethod());
 });
@@ -110,7 +115,8 @@ using (var scope = app.Services.CreateScope())
         {
             FullName = "System Admin",
             Email = "admin@taskmanagement.com",
-            PasswordHash = BCrypt.Net.BCrypt.HashPassword("Admin@123"),
+            PasswordHash = BCrypt.Net.BCrypt.HashPassword(
+                builder.Configuration["Admin:Password"] ?? "Admin@123"),
             Role = UserRole.Admin
         };
         dbContext.Users.Add(adminUser);
@@ -118,15 +124,20 @@ using (var scope = app.Services.CreateScope())
     }
 }
 
+// Swagger stays on in every environment so the live demo can show the API
+app.UseSwagger();
+app.UseSwaggerUI();
+
+app.UseCors("AllowReactApp");
+
+// Azure and Docker terminate HTTPS before the app, so only redirect locally
 if (app.Environment.IsDevelopment())
 {
-    app.UseSwagger();
-    app.UseSwaggerUI();
+    app.UseHttpsRedirection();
 }
 
-app.UseHttpsRedirection();
-app.UseCors("AllowReactApp");
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
+app.MapGet("/health", () => Results.Ok("healthy"));
 app.Run();
