@@ -10,6 +10,7 @@ pool:
 variables:
   azureServiceConnection: azure-taskmgmt
   webAppName: taskmgmt-ibrahim-api
+  apiUrl: https://taskmgmt-ibrahim-api-dwekfce7efd9h7fe.centralindia-01.azurewebsites.net/api
 
 stages:
   - stage: Build
@@ -42,14 +43,16 @@ stages:
           - script: npm ci && npm run build
             workingDirectory: task-management-client
             displayName: Install and build
+            env:
+              VITE_API_URL: $(apiUrl)
 
   - stage: Deploy
-    displayName: Deploy API to Azure App Service
+    displayName: Deploy to Azure
     dependsOn: Build
     condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/develop'))
     jobs:
       - job: DeployApi
-        displayName: Deploy to App Service
+        displayName: Deploy API to App Service
         steps:
           - download: current
             artifact: api
@@ -60,3 +63,22 @@ stages:
               appType: webAppLinux
               appName: $(webAppName)
               package: $(Pipeline.Workspace)/api
+
+      - job: DeployWeb
+        displayName: Deploy React app to Static Web Apps
+        steps:
+          - task: UseNode@1
+            inputs:
+              version: 20.x
+          - script: npm ci && npm run build
+            workingDirectory: task-management-client
+            displayName: Build React app for production
+            env:
+              VITE_API_URL: $(apiUrl)
+          - task: AzureStaticWebApp@0
+            displayName: Deploy to Static Web Apps
+            inputs:
+              app_location: task-management-client/dist
+              skip_app_build: true
+              skip_api_build: true
+              azure_static_web_apps_api_token: $(SWA_TOKEN)
