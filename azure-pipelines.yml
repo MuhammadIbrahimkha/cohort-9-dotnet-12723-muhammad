@@ -17,12 +17,12 @@ stages:
     displayName: Build and test
     jobs:
       - job: Backend
-        displayName: Backend (.NET 8)
+        displayName: Backend (.NET 10)
         steps:
           - task: UseDotNet@2
             inputs:
               packageType: sdk
-              version: 8.0.x
+              version: 10.0.x
           - script: dotnet restore TaskManagementTool/TaskManagementTool.sln
             displayName: Restore
           - script: dotnet build TaskManagementTool/TaskManagementTool.sln -c Release --no-restore

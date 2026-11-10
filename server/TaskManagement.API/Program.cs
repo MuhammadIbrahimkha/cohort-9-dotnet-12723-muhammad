@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using Serilog;
-using Microsoft.OpenApi.Models;
+using Microsoft.OpenApi;
 using TaskManagement.Application.Interfaces.Repositories;
 using TaskManagement.Application.Interfaces.Services;
 using TaskManagement.Infrastructure.Data;
@@ -13,6 +13,7 @@ using TaskManagement.API.Middleware;
 using TaskManagement.Domain.Enums;
 
 var builder = WebApplication.CreateBuilder(args);
+
 builder.Host.UseSerilog((context, services, configuration) => configuration
     .MinimumLevel.Information()
     .WriteTo.Console()
@@ -23,31 +24,25 @@ builder.Services.AddEndpointsApiExplorer();
 
 builder.Services.AddSwaggerGen(options =>
 {
-    options.SwaggerDoc("v1", new OpenApiInfo { Title = "TaskManagement API", Version = "v1" });
+    options.SwaggerDoc("v1", new OpenApiInfo
+    {
+        Title = "TaskManagement API",
+        Version = "v1"
+    });
 
     options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
     {
         Name = "Authorization",
-        Type = SecuritySchemeType.ApiKey,
-        Scheme = "Bearer",
+        Type = SecuritySchemeType.Http,
+        Scheme = "bearer",
         BearerFormat = "JWT",
         In = ParameterLocation.Header,
-        Description = "Enter: Bearer {your JWT token}"
+        Description = "Enter your JWT token (without the 'Bearer ' prefix)."
     });
 
-    options.AddSecurityRequirement(new OpenApiSecurityRequirement
+    options.AddSecurityRequirement(document => new OpenApiSecurityRequirement
     {
-        {
-            new OpenApiSecurityScheme
-            {
-                Reference = new OpenApiReference
-                {
-                    Type = ReferenceType.SecurityScheme,
-                    Id = "Bearer"
-                }
-            },
-            new string[] {}
-        }
+        [new OpenApiSecuritySchemeReference("Bearer", document)] = []
     });
 });
 
@@ -125,8 +120,15 @@ using (var scope = app.Services.CreateScope())
 }
 
 // Swagger stays on in every environment so the live demo can show the API
-app.UseSwagger();
-app.UseSwaggerUI();
+app.UseSwagger(options =>
+{
+    options.OpenApiVersion = OpenApiSpecVersion.OpenApi3_0;
+});
+
+app.UseSwaggerUI(options =>
+{
+    options.SwaggerEndpoint("/swagger/v1/swagger.json", "TaskManagement API v1");
+});
 
 app.UseCors("AllowReactApp");
 
